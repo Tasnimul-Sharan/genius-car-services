@@ -8,18 +8,18 @@ import expert6 from "../../../images/experts/expert-6.png";
 import Expert from "../Expert/Expert";
 
 const experts = [
-  { id: 1, name: "", img: expert1 },
-  { id: 2, name: "", img: expert2 },
-  { id: 3, name: "", img: expert3 },
-  { id: 4, name: "", img: expert4 },
-  { id: 5, name: "", img: expert5 },
-  { id: 6, name: "", img: expert6 },
+  { id: 1, name: "Kayla Mccormick", img: expert1 },
+  { id: 2, name: "Herring Crane", img: expert2 },
+  { id: 3, name: "Lori Ochoa", img: expert3 },
+  { id: 4, name: "Wynn Wilson", img: expert4 },
+  { id: 5, name: "Mcintyre Castaneda", img: expert5 },
+  { id: 6, name: "Cheri Swanson", img: expert6 },
 ];
 
 const Experts = () => {
   return (
-    <div className="container">
-      <h1 className="text-primary mt-5">our experts</h1>
+    <div id="experts" className="container">
+      <h1 className="text-dark mt-5">Our Experts</h1>
       <div className="row">
         {experts.map((expert) => (
           <Expert key={expert.id} expert={expert}></Expert>
