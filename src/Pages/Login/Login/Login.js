@@ -1,6 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Button, Form } from "react-bootstrap";
-// import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import {
   useSendPasswordResetEmail,
   useSignInWithEmailAndPassword,
@@ -8,29 +7,38 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import auth from "../../../firebase.init";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Loading from "../../Shared/Loading/Loading";
 
 const Login = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
-  const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
 
-  const [signInWithEmailAndPassword, user, error] =
-    useSignInWithEmailAndPassword(auth); //, loading, error
+  const [signInWithEmailAndPassword, user, loading, error] =
+    useSignInWithEmailAndPassword(auth);
 
   const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);
 
   const resetPassword = async () => {
     const email = emailRef.current.value;
-    await sendPasswordResetEmail(email);
+    if (email) {
+      await sendPasswordResetEmail(email);
+      toast("sent email");
+    } else {
+      toast("please enter an email");
+    }
   };
-
-  const location = useLocation();
+  let location = useLocation();
   const from = location.state?.from?.pathname || "/";
+
+  if (loading || sending) {
+    return <Loading />;
+  }
 
   if (user) {
     navigate(from, { replace: true });
-    // <Link to="/home"></Link>;
   }
   let errorElement;
   if (error) {
@@ -72,11 +80,7 @@ const Login = () => {
             required
           />
         </Form.Group>
-        <Form.Group
-          onClick={() => setAgree(!agree)}
-          className="mb-3"
-          controlId="formBasicCheckbox"
-        >
+        <Form.Group className="mb-3" controlId="formBasicCheckbox">
           <Form.Check type="checkbox" label="Accept turms and conditions !" />
         </Form.Group>
         <Button variant="dark text-white mx-auto d-block w-50" type="submit">
@@ -92,15 +96,16 @@ const Login = () => {
       </p>
       <p>
         forget password?{" "}
-        <Link
-          to="/register"
+        <Button
+          variant="link"
           className="text-primary text-decoration-none"
           onClick={resetPassword}
         >
           Reset Password
-        </Link>
+        </Button>
       </p>
       <SocialLogin />
+      <ToastContainer />
     </div>
   );
 };

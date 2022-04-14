@@ -1,31 +1,41 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile,
+} from "react-firebase-hooks/auth";
 import auth from "../../../firebase.init";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import Loading from "../../Shared/Loading/Loading";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+
   const [name, setName] = useState("");
 
-  const [
-    createUserWithEmailAndPassword,
-    user,
-    // loading,
-    // error,
-  ] = useCreateUserWithEmailAndPassword(auth);
-
   const navigate = useNavigate();
+  const [createUserWithEmailAndPassword, user, loading, error] =
+    useCreateUserWithEmailAndPassword(auth, { sendEmailVerification: true });
 
-  if (user) {
-    navigate("/home");
+  if (loading || updating) {
+    return <Loading />;
   }
 
-  const handleRegister = (event) => {
+  if (user) {
+    console.log(user, "user");
+  }
+
+  const handleRegister = async (event) => {
     event.preventDefault();
-    createUserWithEmailAndPassword(email, password, name);
+    await createUserWithEmailAndPassword(email, password);
+    await updateProfile({ displayName: name });
+    // alert('Updated profile');
+    console.log("updated profile");
+    navigate("/home");
   };
   return (
     <div className="container w-50 text-start">
@@ -59,10 +69,18 @@ const Register = () => {
             placeholder="Password"
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Accept turms and conditions !" />
+        <Form.Group
+          onClick={() => setAgree(!agree)}
+          //   className="mb-3"
+          controlId="formBasicCheckbox"
+        >
+          <Form.Check
+            className={agree ? "" : "text-danger"}
+            type="checkbox"
+            label="Accept turms and conditions !"
+          />
         </Form.Group>
-        <Button variant="dark text-white" type="submit">
+        <Button disabled={!agree} variant="dark text-white" type="submit">
           Submit
         </Button>
       </Form>
